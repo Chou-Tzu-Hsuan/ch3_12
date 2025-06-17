@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+{% block title %}
+<title>學生資料管理系統</title>
+<style>
+    h1,h2 {
+        text-align: center;
+    }
+    table, th, td {
+        border: 1px solid;
+        border-collapse: collapse;
+    }
+    table {
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .head_content {
+        margin-bottom: 24px;
+    }
+
+    .pagination {
+        text-align: center;
+        margin-top: 30px;
+        font-size: 16px;
+    }
+
+    .pagination a,
+    .pagination span {
+        display: inline-block;
+        padding: 8px 12px;
+        margin: 0 4px;
+        text-decoration: none;
+        color: #007BFF;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        background-color: #fff;
+        transition: all 0.3s ease;
+    }
+
+    .pagination a:hover {
+        background-color: #f1f1f1;
+        color: #0056b3;
+    }
+
+    .pagination .current {
+        background-color: #007BFF;
+        color: white;
+        font-weight: bold;
+        border: 1px solid #007BFF;
+    }
+
+</style>
+{% endblock  %}
+
+{% block content %}
+<div class="head_content">
+    <h1 class="title">學生資料管理系統</h1>
+    <h2>目前資料筆數:{{dataCount}},
+        <a href="/post/">新增學生資料</a>
+    </h2>
+    <div style="text-align: center;">
+        <form action="/index/" method="get">
+            <label for="site_search">搜尋關鍵字:</label>
+            <input type="search" id="site_search" name="site_search">
+            <button type="submit">搜尋</button>
+        </form>
+    </div>
+</div>
+<div>
+    {% if status %}
+    <table>
+        <tr>
+            <th>學號</th>
+            <th>姓名</th>
+            <th>姓別</th>
+            <th>生日</th>
+            <th>信箱</th>
+            <th>電話</th>
+            <th>地址</th>
+            <th>編輯</th>
+        </tr>
+        {% for data in page_obj %}
+        <tr>
+            <td>{{data.cID}}</td>
+            <td>{{data.cName}}</td>
+            <td>{% if data.cSex == "M" %}男 {% else %} 女 {% endif %}</td>
+            <td>{{data.cBirthday |date:'Y-m-d'}}</td> 
+            <td>{{data.cEmail}}</td>
+            <td>{{data.cPhone}}</td>
+            <td>{{data.cAddr}}</td>
+            <td>
+                <a href="/edit/{{data.cID}}/">編輯</a> <!--有2種方式:這是網址方式-->
+                {% comment %} <a href="/edit/?cID-{{data.cID}}/">編輯</a>{% endcomment %} <!--這是get方式的編輯-->
+                <a href="/delete/{{data.cID}}/">刪除</a>
+            </td>
+            
+        </tr>
+        {% endfor %}
+    </table>
+
+    {% comment %} <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?page=1">最前頁</a>
+            <a href="?page={{ page_obj.previous_page_number }}">上一頁</a>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range  %}
+
+            {% if num == page_obj.number %}
+                <span class="current">{{num}}</span>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3'%}
+                <a href="?page={{num}}">{{num}}</a>
+            {% endif %}
+
+        {% endfor %}
+
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number} }">下一頁</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}">最後一頁</a>
+        {% endif %}
+    </div> {% endcomment %}
+
+
+    {% comment %}  加入判斷羅輯 {% endcomment %}
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+            <a href="?page=1{% if site_search %}&site_search={{site_search}}{% endif %}">最前頁</a>
+            <a href="?page={{ page_obj.previous_page_number }}{% if site_search %}&site_search={{site_search}}{% endif %}">上一頁</a>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range  %}
+
+            {% if num == page_obj.number %}
+                <span class="current">{{num}}</span>
+            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3'%}
+                <a href="?page={{num}}{% if site_search %}&site_search={{site_search}}{% endif %}">{{num}}</a>
+            {% endif %}
+
+        {% endfor %}
+
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number}}{% if site_search %}&site_search={{site_search}}{% endif %}">下一頁</a>
+            <a href="?page={{ page_obj.paginator.num_pages }}{% if site_search %}&site_search={{site_search}}{% endif %}">最後一頁</a>
+        {% endif %}
+    </div>
+
+
+
+
+
+    {% else %}
+        <h1>查不到資料唷</h1>
+    {% endif %}
+</div>
+{% endblock  %}
